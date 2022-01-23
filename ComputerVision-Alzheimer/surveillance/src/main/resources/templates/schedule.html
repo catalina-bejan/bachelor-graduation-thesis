@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Scheduler</title>
+    <div th:replace="head :: header"></div>
+
+    <script>function formatTime() {
+    document.getElementById("sleeping_time_from").value = document.getElementById("sleeping_time_from").value+":00";
+    document.getElementById("sleeping_time_to").value = document.getElementById("sleeping_time_to").value+":00";
+    alert("value: " +document.getElementById("sleeping_time_to").value)
+    }</script>
+</head>
+<body>
+<div th:replace="navbar :: nav"></div>
+<br>
+    <div class="card shadow p-3 mb-5 bg-white rounded align-middle col-lg-6" style="margin-left: auto; margin-right: auto;">
+        <div class="card-body">
+            <form th:action="@{/update}" method="post">
+                <div class="row">
+                    <div class="form-group col-lg-12">
+                        <label for="email">Email address</label>
+                        <input type="email" th:field="${user.email}" class="form-control" id="email" aria-describedby="emailHelp">
+                        <small id="emailHelp" class="form-text text-muted">Caregiver's email address to receive notifications.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="activity_scan_period">Scanned period</label>
+                        <input type="number" th:field="${scheduler.activityScanSeconds}" min="1" max="120" class="form-control" id="activity_scan_period" aria-describedby="ScanPeriodHelp">
+                        <small id="ScanPeriodHelp" class="form-text text-muted">Number of seconds at which the patient's activity will be scanned for notifications.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="sleeping_time_from">Sleeping time starts at</label>
+                        <input type="time" th:field="${scheduler.sleepingFrom}" name ="sleepingFrom" class="form-control" id="sleeping_time_from" aria-describedby="SleepFromHelp">
+                        <small id="SleepFromHelp" class="form-text text-muted">The time at which the patient usually goes to sleep.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="sleeping_time_to">Sleeping time ends at</label>
+                        <input type="time" th:field="${scheduler.sleepingTo}" name ="sleepingTo" class="form-control" id="sleeping_time_to" aria-describedby="SleepToHelp">
+                        <small id="SleepToHelp" class="form-text text-muted">The time at which the patient usually wakes up.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="min_hours_between_meals">Minimum hours between meals</label>
+                        <input type="number" th:field="${scheduler.minHoursBetweenMeals}" min="1" max="10" class="form-control" id="min_hours_between_meals" aria-describedby="MinHoursMealsHelp">
+                        <small id="MinHoursMealsHelp" class="form-text text-muted">The minimum amount of hours between meals in which the patient should not eat.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="max_hours_between_meals">Maximum hours between meals</label>
+                        <input type="number" th:field="${scheduler.maxHoursBetweenMeals}" min="2" max="10" class="form-control" id="max_hours_between_meals" aria-describedby="MaxHoursMealsHelp">
+                        <small id="MaxHoursMealsHelp" class="form-text text-muted">The maximum amount of hours between meals in which the patient would not eat.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="eating_minutes">Eating period</label>
+                        <input type="number" th:field="${scheduler.eatingMinutes}" min="1" max="60" class="form-control" id="eating_minutes" aria-describedby="EatingPeriodHelp">
+                        <small id="EatingPeriodHelp" class="form-text text-muted">The maximum number of minutes the patient eats uninterrupted.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="minutes_between_drinks">Minutes between drinks</label>
+                        <input type="number" th:field="${scheduler.minutesBetweenDrinks}" min="1" max="120" class="form-control" id="minutes_between_drinks" aria-describedby="BetweenDrinksHelp">
+                        <small id="BetweenDrinksHelp" class="form-text text-muted">The maximum number of minutes the patient does not drink.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="minutes_between_eat_notifications">Minutes between notifications to eat</label>
+                        <input type="number" th:field="${scheduler.minutesBetweenEatNotifications}" min="1" max="30" class="form-control" id="minutes_between_eat_notifications" aria-describedby="BetweenEatNotificationHelp">
+                        <small id="BetweenEatNotificationHelp" class="form-text text-muted">The number of minutes between notifications that say the patient must eat.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="minutes_between_drink_notifications">Minutes between notifications to drink</label>
+                        <input type="number" th:field="${scheduler.minutesBetweenDrinkNotifications}" min="1" max="15" class="form-control" id="minutes_between_drink_notifications" aria-describedby="BetweenDrinkNotificationHelp">
+                        <small id="BetweenDrinkNotificationHelp" class="form-text text-muted">The number of minutes between notifications that say the patient must drink.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="message_for_patient_stop_eating">Notification to the patient to remind him/her to stop eating</label>
+                        <input type="text" th:field="${notificationMessage.eatingTooOftenMessage}" class="form-control" id="message_for_patient_stop_eating" aria-describedby="PatientMessageStopEatingHelp">
+                        <small id="PatientMessageStopEatingHelp" class="form-text text-muted">The reminder message for the patient for when he/she forgets that he/she ate a short time ago or that he/she has been eating uninterrupted for too long.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="message_for_patient_forget_eat">Notification to the patient when he/she forgets to eat</label>
+                        <input type="text" th:field="${notificationMessage.forgotToEatMessage}" class="form-control" id="message_for_patient_forget_eat" aria-describedby="PatientMessageForgerEatHelp">
+                        <small id="PatientMessageForgerEatHelp" class="form-text text-muted">The reminder message for to the patient when he/she forgets to eat.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="message_for_patient_forget_drink">Notification to the patient when he/she forgets to drink</label>
+                        <input type="text" th:field="${notificationMessage.forgotToDrinkMessage}" class="form-control" id="message_for_patient_forget_drink" aria-describedby="PatientMessageForgerDrinkHelp">
+                        <small id="PatientMessageForgerDrinkHelp" class="form-text text-muted">The reminder message for to the patient when he/she forgets to drink.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="message_for_caretaker_stop_eating">Notification to the caregiver when the patient should stop eating</label>
+                        <input type="text" th:field="${notificationMessage.eatingTooOftenMessageForCaretaker}" class="form-control" id="message_for_caretaker_stop_eating" aria-describedby="CaretakerMessageStopEatingHelp">
+                        <small id="CaretakerMessageStopEatingHelp" class="form-text text-muted">Email notification message for the caregiver for when patient forgets that he/she ate a short time ago or that he/she has been eating uninterrupted for too long.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="message_for_caretaker_forget_eat">Notification to the caregiver when the patient forgets to eat</label>
+                        <input type="text" th:field="${notificationMessage.forgotToEatMessageForCaretaker}" class="form-control" id="message_for_caretaker_forget_eat" aria-describedby="CaretakerMessageForgerEatHelp">
+                        <small id="CaretakerMessageForgerEatHelp" class="form-text text-muted">Email notification message for the caregiver when patient forgets to eat.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="message_for_caretaker_forget_drink">Notification to the caregiver when the patient forgets to drink</label>
+                        <input type="text" th:field="${notificationMessage.forgotToDrinkMessageForCaretaker}" class="form-control" id="message_for_caretaker_forget_drink" aria-describedby="CaretakerMessageForgerDrinkHelp">
+                        <small id="CaretakerMessageForgerDrinkHelp" class="form-text text-muted">Email notification message for the caregiver when patient forgets to drink.</small>
+                    </div>
+                    <div class="form-group col-lg-12">
+                        <label for="hours_stored">Number of hours before data deletion</label>
+                        <input type="number" th:field="${scheduler.storedDataHours}" min="6" max="72" class="form-control" id="hours_stored" aria-describedby="HoursStoredHelp">
+                        <small id="HoursStoredHelp" class="form-text text-muted">Delete data older than this number of hours.</small>
+                    </div>
+                    <div class="col text-center">
+                        <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

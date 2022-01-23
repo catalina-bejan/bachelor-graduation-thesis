@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html>
+<head>
+    <head>
+        <title>Surveillance</title>
+        <div th:replace="head :: header"></div>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    </head>
+</head>
+<body>
+<div th:replace="navbar :: nav"></div>
+
+<br>
+<div class="row align-middle col-lg-10" style="margin-left: auto; margin-right: auto;">
+    <div class="card shadow p-3 mb-5 bg-white rounded align-middle col-lg-5" style="margin-left: auto; margin-right: auto;">
+    <!--    <img src="..." class="card-img-top" alt="...">-->
+        <img id="myImg" src="/images/nosignal.jpg" class="card-img-top" alt="..."></img>
+        <div class="card-body">
+            <p class="card-text text-center">Human Activity Recognition in Video.</p>
+        </div>
+    </div>
+    <div class="card shadow p-3 mb-5 bg-white rounded align-middle col-lg-5" style="margin-left: auto; margin-right: auto;">
+        <!--    <img src="..." class="card-img-top" alt="...">-->
+        <img id="myVideo" src="/images/nosignal.jpg" class="card-img-top" alt="..."></img>
+        <div class="card-body">
+            <p class="card-text text-center">Binary Image Classification and Object Detection in Image.</p>
+        </div>
+    </div>
+</div>
+<!--<img id="myImg"></img>-->
+<!--<img id="myVideo"></img>-->
+</body>
+
+<script>
+            var ws = new WebSocket("ws://192.168.0.106:5678/"),
+                messages = document.createElement('ul');
+			var ws2 = new WebSocket("ws://192.168.0.106:5679/"),
+                messages = document.createElement('ul');
+            ws.onmessage = function (event) {
+                add_img(event.data,"myImg");
+				//imgElem.setAttribute('src', "data:image/jpg;base64," + event.data);
+            };
+			ws2.onmessage = function (event) {
+                add_img(event.data,"myVideo");
+				//imgElem.setAttribute('src', "data:image/jpg;base64," + event.data);
+            };
+
+
+
+			function add_img(data,imgId) {
+				//var img = new Image();
+				var my_string = data.substring(2,data.length-1);
+				document.getElementById(imgId).src = "data:image/png;base64," + my_string;
+				//img.src = "data:image/png;base64," + my_string;
+				//console.log(data)
+				//document.body.appendChild(img);
+		}
+
+        </script>
+</html>

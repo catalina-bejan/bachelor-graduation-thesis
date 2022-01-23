@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Notifiations</title>
+    <div th:replace="head :: header"></div>
+</head>
+<body>
+<div th:replace="navbar :: nav"></div>
+
+<div th:switch="${notificationPagination.totalElements}">
+    <h2 th:case="0">No notifications yet!</h2>
+    <br>
+    <div th:case="*">
+        <div class="card shadow p-3 mb-5 bg-white rounded align-middle col-lg-8" style="margin-left: auto; margin-right: auto;">
+            <div class="card-body table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Date and Time</th>
+                        <th>Type</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="notificationTracker : ${notificationPagination.notifications}">
+                        <td th:text="${notificationTracker.timestamp}"></td>
+                        <td th:text="${notificationTracker.notification.type}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <nav aria-label="...">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${notificationPagination.pageNumber != 0 ? '' : 'disabled'}">
+                            <a th:href="${urlBuilder.replaceQueryParam('page', notificationPagination.pageNumber - 1).toUriString()}"
+                               th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
+                               class="page-link">Previous</a>
+                        </li>
+                        <li class="page-item active" aria-current="page">
+                            <span th:utext="'Page <b>'+${notificationPagination.pageNumber + 1}+'</b> of <b>'+${notificationPagination.totalPages}+'</b>'" class="page-link"></span>
+                        </li>
+                        <li class="page-item" th:classappend="${notificationPagination.pageNumber + 1 < notificationPagination.totalPages ? '' : 'disabled'}">
+                            <a th:href="${urlBuilder.replaceQueryParam('page', notificationPagination.pageNumber + 1).toUriString()}"
+                               th:with="urlBuilder=${T(org.springframework.web.servlet.support.ServletUriComponentsBuilder).fromCurrentRequest()}"
+                               class="page-link">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
